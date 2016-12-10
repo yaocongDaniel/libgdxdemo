@@ -1,4 +1,4 @@
-package edu.nju.wsj.libgdx;
+package edu.nju.wsj.libgdx.spirit;
 
 import java.util.ArrayList;
 
@@ -23,6 +23,8 @@ public class AnimalActor extends Actor implements Disposable{
 	float stateTime;
 	TextureRegion currentFrame;//当前帧
 	AssetManager manager;//保存Progress里面保存的manager实例
+	
+	boolean hasinit = false;
 	@Override
 	public void draw(SpriteBatch arg0, float arg1) {
 		// TODO Auto-generated method stub
@@ -30,7 +32,7 @@ public class AnimalActor extends Actor implements Disposable{
 		//得到下一帧
 		currentFrame = animation.getKeyFrame(stateTime, true);
 		//以(0,0)绘制为起点（左下角为0，0）画出动画，大小128*128
-		arg0.draw(currentFrame,0, 0,128*power,128*power);
+		arg0.draw(currentFrame, x, y, width, height);
 	}
 	
 	
@@ -87,23 +89,23 @@ public class AnimalActor extends Actor implements Disposable{
 		
 		//设置的是0.06s一帧
 		animation = new Animation(0.06f, walksFrame);
-		
+		hasinit = true;
 	}
 
+	public boolean hasInit(){
+		return hasinit;
+	}
 
 	@Override
 	public void dispose() {
 		// TODO Auto-generated method stub
-		
 		//释放AnimalActor中持有的资源
 		for(int i=0;i<TexArray.size();i++)
 			TexArray.get(i).dispose();
+		hasinit = false;
 	}
 	
-	
+	public void setPower(float width){
+		power = width / 500;
 	}
-	
-	
-	
-
-
+}

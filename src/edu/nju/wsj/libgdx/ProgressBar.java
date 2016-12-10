@@ -13,15 +13,12 @@ public class ProgressBar extends Actor implements Disposable{
 	int height;
 	int width;
 	float progress;
-	//做了一个简单的适配，powerx和powery分别当前设备分辨率的权重，以现在主流的800*480为基准
-	float powerx;
-	float powery;
 	AssetManager manager;
 	@Override
 	public void draw(SpriteBatch batch, float arg1) {
 		// TODO Auto-generated method stub
-		batch.draw(platform, (Gdx.graphics.getWidth()-bar.getWidth()*powerx)/2, 0,platform.getWidth()*powerx,platform.getHeight()*powery);
-		batch.draw(bar,(Gdx.graphics.getWidth()-bar.getWidth()*powerx)/2,0,bar.getWidth()*progress/100f*powerx,bar.getHeight()*powery);
+		batch.draw(platform, x, y, width, height);
+		batch.draw(bar, x, y, width * progress / 100f, height);
 	}
 
 	@Override
@@ -30,20 +27,17 @@ public class ProgressBar extends Actor implements Disposable{
 		return null;
 	}
 
-	public ProgressBar(int x,int y) {
+	public ProgressBar(int x,int y, int w, int h) {
 		super();
-		//设定Actor的位置，这里并没有什么用，纯粹为了和大家介绍一下
-		this.x=x;
-		this.y=y;
-		//新建一个AssetManager
-		manager=new AssetManager();
-		platform=new Texture(Gdx.files.internal("black.png"));
-		bar=new Texture(Gdx.files.internal("green.png"));
-		height=Gdx.graphics.getHeight();
-		width=Gdx.graphics.getWidth();
-		//做了一个简单的适配，powerx和powery分别当前设备分辨率的权重，以现在主流的800*480为基准
-		powerx=Gdx.graphics.getWidth()/800f;
-		powery=Gdx.graphics.getHeight()/480f;
+		// 设定Actor的位置，这里并没有什么用，纯粹为了和大家介绍一下
+		this.x = x;
+		this.y = y;
+		// 新建一个AssetManager
+		manager = new AssetManager();
+		platform = new Texture(Gdx.files.internal("black.png"));
+		bar = new Texture(Gdx.files.internal("green.png"));
+		width = w;
+		height = h;
 	}
 	public void setProgress(float progress){
 		this.progress=progress;
