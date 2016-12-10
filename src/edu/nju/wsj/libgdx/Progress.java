@@ -16,12 +16,16 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.input.GestureDetector;
 import com.badlogic.gdx.input.GestureDetector.GestureListener;
+import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle;
 
 import edu.nju.wsj.libgdx.spirit.AnimalActor;
+import edu.nju.wsj.libgdx.spirit.ProjectileGroup;
 import edu.nju.wsj.libgdx.spirit.TargetGroup;
 
 public class Progress implements Screen, InputProcessor, GestureListener {
@@ -39,6 +43,7 @@ public class Progress implements Screen, InputProcessor, GestureListener {
 	boolean initgame = false;
 	
 	TargetGroup mTargetGroup = null;
+	ProjectileGroup mProjectileGroup = null;
 	
 	TextureAtlas mAtlas = null;
 	@Override
@@ -58,13 +63,13 @@ public class Progress implements Screen, InputProcessor, GestureListener {
 				if(manager.update()){
 					playing = true;
 					bar.setProgress(100);
-					stage.removeActor(bar);
+					bar.remove();
 					// 加载完成且之前没有初始化过AnimalActor，且在手触摸屏幕时初始化AnimalActor,并将进度条从舞台中移除，并加入AnimalActor对象
 				}else{
 					bar.setProgress(manager.getProgress() * 100);
 				}
 				fpslabel.setText("FPS:" + Gdx.graphics.getFramesPerSecond());
-				fpslabel.x = (Gdx.graphics.getWidth() - fpslabel.getTextBounds().width);
+				fpslabel.setX(Gdx.graphics.getWidth() - fpslabel.getPrefWidth());//设置X值，显示为最后一个字紧靠屏幕最右侧
 			}
 			// 我们做一个标记，看看未加载（Queued）完成的资源和已加载完成的资源的数量（Loaded）
 			if (!manager.update()) {
@@ -77,11 +82,33 @@ public class Progress implements Screen, InputProcessor, GestureListener {
 					animal.iniResource();
 					stage.addActor(animal);
 				}
+				stage.addActor(mTargetGroup);
+				stage.addActor(mProjectileGroup);
 				initgame = true;
+			}
+			if(initgame){
+				// 开始处理飞镖
+				Actor[] projectile = mProjectileGroup.getChildren().begin();
+				Actor[] targets = mTargetGroup.getChildren().begin();
+				for (int i = 0; i < mProjectileGroup.getChildren().size; i++) {
+					Actor actor = projectile[i];
+					for (int j = 0; j < mTargetGroup.getChildren().size; j++) {
+						Actor target = targets[j];
+						if (mProjectileGroup.attackAlive(target, actor)) {
+							mTargetGroup.removeActor(target);
+							mProjectileGroup.removeActor(actor);
+							target.clear();
+							actor.clear();
+							mTargetGroup.addMan();
+							break;
+						}
+					}
+				}
 			}
 		}
 	}
 
+	
 	@Override
 	public void resize(int arg0, int arg1) {
 	}
@@ -102,7 +129,7 @@ public class Progress implements Screen, InputProcessor, GestureListener {
 			int y = (Gdx.graphics.getHeight() - h) / 2;
 			bar = new ProgressBar(x, y, w, h);
 			// 新建一个舞台
-			stage = new Stage(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), true);
+			stage = new Stage();
 			stage.addActor(bar);
 			// 记得初始化一下AssetManager实例
 			manager = new AssetManager();
@@ -112,20 +139,23 @@ public class Progress implements Screen, InputProcessor, GestureListener {
 			for (int i = 1; i < 30; i++) {
 				manager.load("animal/" + i + ".png", Texture.class);
 			}
-			animal.width = Gdx.graphics.getHeight() / 3;
-			animal.height = animal.width;
-			animal.x = 0;
-			animal.y = Gdx.graphics.getHeight() / 2 - animal.height / 2;
+			animal.setWidth(Gdx.graphics.getHeight() / 3);
+			animal.setHeight(animal.getWidth());
+			animal.setX(0);
+			animal.setY(Gdx.graphics.getHeight() / 2 - animal.getHeight() / 2);
 			LabelStyle labelStyle =new LabelStyle(new BitmapFont(), Color.BLACK);//创建一个Label样式，使用默认黑色字体
 			fpslabel =new Label("FPS:", labelStyle);//创建标签，显示的文字是FPS：
-			fpslabel.y = 0;
-			fpslabel.x = (Gdx.graphics.getWidth() - fpslabel.getTextBounds().width);//设置X值，显示为最后一个字紧靠屏幕最右侧
+			fpslabel.setY(0);			
+			fpslabel.setX(Gdx.graphics.getWidth() - fpslabel.getPrefWidth());//设置X值，显示为最后一个字紧靠屏幕最右侧
 			stage.addActor(fpslabel);//将标签添加到舞台
 			
+			mAtlas =new TextureAtlas("mans/mans.pack");
+			mTargetGroup = new TargetGroup(mAtlas.findRegion("man0"), Gdx.graphics.getHeight() / 7, Gdx.graphics.getHeight() / 7, 
+					Gdx.graphics.getWidth() * 2 / 7, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 			
-			mAtlas =new TextureAtlas("mans/mans.atlas");
-			
-			mTargetGroup = new TargetGroup(mAtlas.findRegion("main0"));
+			mProjectileGroup = new ProjectileGroup(mAtlas.findRegion("gameball"), Gdx.graphics.getHeight() / 7, Gdx.graphics.getHeight() / 7, 
+					Gdx.graphics.getWidth() / 7, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+			mProjectileGroup.setStartPosition((int)(animal.getX() + animal.getWidth()), (int)(animal.getY() + animal.getHeight()/2));
 			
 			hasini = true;
 		}
@@ -136,6 +166,13 @@ public class Progress implements Screen, InputProcessor, GestureListener {
 		Gdx.input.setInputProcessor(multiplexer);
 	}
 
+	@Override
+	public boolean touchDown(int screenX, int screenY, int arg2, int arg3) {
+		Vector3 vector3 = new Vector3(screenX, screenY, 0);
+		stage.getCamera().unproject(vector3);// 坐标转化
+		mProjectileGroup.addProjectile((int)vector3.x, (int)vector3.y);
+		return false;
+	}
 	@Override
 	public void dispose() {
 		// TODO Auto-generated method stub
@@ -162,7 +199,7 @@ public class Progress implements Screen, InputProcessor, GestureListener {
 		if (arg0 == Input.Keys.BACK) {
 			System.out.println("Back Pressed");
 			activity.ag.setScreen(activity.mg);
-			stage.removeActor(animal);
+//			stage.removeActor(animal);
 		}
 		return false;
 	}
@@ -186,19 +223,7 @@ public class Progress implements Screen, InputProcessor, GestureListener {
 	}
 
 	@Override
-	public boolean touchDown(int arg0, int arg1, int arg2, int arg3) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
 	public boolean touchDragged(int arg0, int arg1, int arg2) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public boolean touchMoved(int arg0, int arg1) {
 		// TODO Auto-generated method stub
 		return false;
 	}
@@ -209,26 +234,6 @@ public class Progress implements Screen, InputProcessor, GestureListener {
 		return false;
 	}
 
-	@Override
-	public boolean fling(float arg0, float arg1) {
-		// TODO Auto-generated method stub
-		Log.i("Testin-apkbus", "fling");
-		return false;
-	}
-
-	@Override
-	public boolean longPress(int arg0, int arg1) {
-		// TODO Auto-generated method stub
-		Log.i("Testin-apkbus", "longPress");
-		return false;
-	}
-
-	@Override
-	public boolean pan(int arg0, int arg1, int arg2, int arg3) {
-		// TODO Auto-generated method stub
-		Log.i("Testin-apkbus", "pan");
-		return false;
-	}
 
 	@Override
 	public boolean pinch(Vector2 arg0, Vector2 arg1, Vector2 arg2, Vector2 arg3) {
@@ -237,25 +242,54 @@ public class Progress implements Screen, InputProcessor, GestureListener {
 		return false;
 	}
 
-	@Override
-	public boolean tap(int arg0, int arg1, int arg2) {
-		// TODO Auto-generated method stub
-		Log.i("Testin-apkbus", "tap");
-		return false;
-	}
-
-	@Override
-	public boolean touchDown(int arg0, int arg1, int arg2) {
-		// TODO Auto-generated method stub
-		Log.i("Testin-apkbus", "touchDown");
-		return false;
-	}
 
 	@Override
 	public boolean zoom(float arg0, float arg1) {
 		// TODO Auto-generated method stub
 		Log.i("Testin-apkbus", "zoom");
 //		animal.power = arg1 / arg0;
+		return false;
+	}
+
+	@Override
+	public boolean fling(float arg0, float arg1, int arg2) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean longPress(float arg0, float arg1) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean pan(float arg0, float arg1, float arg2, float arg3) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean panStop(float arg0, float arg1, int arg2, int arg3) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean tap(float arg0, float arg1, int arg2, int arg3) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean touchDown(float arg0, float arg1, int arg2, int arg3) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean mouseMoved(int arg0, int arg1) {
+		// TODO Auto-generated method stub
 		return false;
 	}
 

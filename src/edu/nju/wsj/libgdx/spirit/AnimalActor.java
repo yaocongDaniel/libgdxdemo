@@ -3,10 +3,12 @@ package edu.nju.wsj.libgdx.spirit;
 import java.util.ArrayList;
 
 
+
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
+import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.Actor;
@@ -25,14 +27,15 @@ public class AnimalActor extends Actor implements Disposable{
 	AssetManager manager;//保存Progress里面保存的manager实例
 	
 	boolean hasinit = false;
+
 	@Override
-	public void draw(SpriteBatch arg0, float arg1) {
+	public void draw(Batch arg0, float arg1) {
 		// TODO Auto-generated method stub
 		stateTime += Gdx.graphics.getDeltaTime();
 		//得到下一帧
 		currentFrame = animation.getKeyFrame(stateTime, true);
 		//以(0,0)绘制为起点（左下角为0，0）画出动画，大小128*128
-		arg0.draw(currentFrame, x, y, width, height);
+		arg0.draw(currentFrame, getX(), getY(), getWidth(), getHeight());
 	}
 	
 	
@@ -43,29 +46,6 @@ public class AnimalActor extends Actor implements Disposable{
 	}
 
 
-	@Override
-	public Actor hit(float x, float y) {
-		// TODO Auto-generated method stub
-            return this; 
-	}
-
-	@Override
-	public boolean touchDown(float arg0, float arg1, int arg2) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public void touchDragged(float arg0, float arg1, int arg2) {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void touchUp(float arg0, float arg1, int arg2) {
-		// TODO Auto-generated method stub
-
-	}
 
 	//初始化方法，在Progress中的AssetManager初始化完成后通知AnimalActor初始化
 	public void iniResource(){

@@ -20,11 +20,15 @@ import com.badlogic.gdx.graphics.g2d.ParticleEffectPool;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
-import com.badlogic.gdx.scenes.scene2d.ui.ClickListener;
+import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.ui.Button.ButtonStyle;
 import com.badlogic.gdx.scenes.scene2d.ui.Window;
+import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
+import com.badlogic.gdx.utils.viewport.ScreenViewport;
+import com.badlogic.gdx.utils.viewport.Viewport;
 
 public class MyGame implements Screen, InputProcessor {
 	private final static String TAG = "MyGame";
@@ -105,79 +109,75 @@ public class MyGame implements Screen, InputProcessor {
 			mHeight = Gdx.graphics.getHeight();
 			initUI(mWidth, mHeight);
 		}
-		InputMultiplexer multiplexer = new InputMultiplexer();
-		multiplexer.addProcessor(stage);
-		multiplexer.addProcessor(this);
+		InputMultiplexer multiplexer = new InputMultiplexer(stage, this);
+//		multiplexer.addProcessor(stage);
+//		multiplexer.addProcessor(this);
 		Gdx.input.setInputProcessor(multiplexer);
 	}
 
 	private void initUI(int width, int height){
 		if(!hasini){
 			Log.d(TAG, "   show()    hasini = " + hasini);
-			stage = new Stage(width, height, true);
+			stage = new Stage(new ScreenViewport());
 			bf = new BitmapFont();
 			tx2 = new Texture(Gdx.files.internal("button1_480.png"));
 			tx1 = new Texture(Gdx.files.internal("button2_480.png"));
 			tx3 = new Texture(Gdx.files.internal("button3_480.png"));
-			int left = 14;
-			int right = 34;
-			int top = 18;
-			int bottom = 38;
-			NinePatch n1 = new NinePatch(tx1, left, right, top, bottom);
-			NinePatch n2 = new NinePatch(tx2, left, right, top, bottom);
-			NinePatch n3 = new NinePatch(tx3, left, right, top, bottom);
 
 			TextureRegion txr = new TextureRegion(new Texture(Gdx.files.internal("dialog.png")), 512, 256);
-			dialog = new Window("dialog", new Window.WindowStyle(bf, new Color(), new NinePatch(txr)));
+			dialog = new Window("dialog", new Window.WindowStyle(bf, new Color(), new TextureRegionDrawable(txr)));
 			// 做一个简单的适配,乘以1.2是为了让图片显示出来的时候大一点
-			dialog.width = 512 * 1.2f * width / 800f;
-			dialog.height = 256 * 1.2f * height * 2 / 800f;
+			dialog.setWidth( 512 * 1.2f * width / 800f);
+			dialog.setHeight(256 * 1.2f * height * 2 / 800f);
 			// 为了让图片保持居中
-			dialog.x = (width - dialog.width) / 2;
-			dialog.y = (height - dialog.height) / 2;
+			dialog.setX((width - dialog.getWidth()) / 2);
+			dialog.setY((height - dialog.getHeight()) / 2);
 
-			ok = new Button(new TextureRegion(new Texture(Gdx.files.internal("ok.png")), 160, 80));
-			ok.width = dialog.width / 5;
-			ok.height = dialog.height / 5;
-			ok.x = dialog.width * 1 / 5;
-			ok.y = dialog.height / 5;
+			ok = new Button(new TextureRegionDrawable(new TextureRegion(new Texture(Gdx.files.internal("ok.png")), 160, 80)));
+			ok.setWidth(dialog.getWidth() / 5);
+			ok.setHeight(dialog.getHeight() / 5);
+			ok.setX(dialog.getWidth() * 1 / 5);
+			ok.setY(dialog.getHeight() / 5);
 			// 给ok这个按钮添加监听器
-			ok.setClickListener(new ClickListener(){
+			ok.addListener(new ClickListener(){
 				@Override
-				public void click(Actor arg0, float arg1, float arg2) {
+				public void clicked(InputEvent event, float x, float y) {
 					// 关闭程序
 					activity.finish();
 					android.os.Process.killProcess(android.os.Process.myPid());
 				}
 			});
-			cancel = new Button(new TextureRegion(new Texture(Gdx.files.internal("cancel.png")), 160, 80));
-			cancel.width = dialog.width / 5;
-			cancel.height = dialog.height / 5;
-			cancel.x = dialog.width * 3 / 5;
-			cancel.y = dialog.height / 5;
-			cancel.setClickListener(new ClickListener() {
+			cancel = new Button(new TextureRegionDrawable(new TextureRegion(new Texture(Gdx.files.internal("cancel.png")), 160, 80)));
+			cancel.setWidth(dialog.getWidth() / 5);
+			cancel.setHeight(dialog.getHeight() / 5);
+			cancel.setX(dialog.getWidth() * 3 / 5);
+			cancel.setY(dialog.getHeight() / 5);
+			cancel.addListener(new ClickListener() {
 				@Override
-				public void click(Actor arg0, float arg1, float arg2) {
+				public void clicked(InputEvent event, float x, float y) {
 					// TODO Auto-generated method stub
 					// 移除对话框
-					stage.removeActor(dialog);
+					dialog.remove();
 					hasdialog = false;
 				}
 			});
 			dialog.addActor(ok);
 			dialog.addActor(cancel);
-			button_start = new Button(new ButtonStyle(n1, n2, n3, 0f, 0f, 0f, 0f), "Start");
-			button_start.setClickListener(new ClickListener() {
+			button_start = new Button(new ButtonStyle(new TextureRegionDrawable(new TextureRegion(tx1,0, 0, tx1.getWidth(), tx1.getHeight())), 
+					new TextureRegionDrawable(new TextureRegion(tx2, 0, 0, tx2.getWidth(), tx2.getHeight())), 
+					new TextureRegionDrawable(new TextureRegion(tx3, 0, 0, tx3.getWidth(), tx3.getHeight()))));
+			
+			button_start.addListener(new ClickListener() {
 				@Override
-				public void click(Actor arg0, float arg1, float arg2) {
+				public void clicked(InputEvent event, float x, float y) {
 					// TODO Auto-generated method stub
 					activity.ag.setScreen(activity.progress);
 				}
 			});
-			button_start.width = width / 6;
-			button_start.height = height / 6;
-			button_start.x = width / 5;
-			button_start.y = height / 5;
+			button_start.setWidth(width / 6);
+			button_start.setHeight(height / 6);
+			button_start.setX(width / 5);
+			button_start.setY(height / 5);
 			stage.addActor(button_start);
 			batch = new SpriteBatch();
 
@@ -207,7 +207,8 @@ public class MyGame implements Screen, InputProcessor {
 				stage.addActor(dialog);
 				hasdialog = true;
 			}else {
-				stage.removeActor(dialog);
+//				stage.removeActor(dialog);
+				dialog.remove();
 				hasdialog = false;
 			}
 		}
@@ -245,12 +246,6 @@ public class MyGame implements Screen, InputProcessor {
 	}
 
 	@Override
-	public boolean touchMoved(int arg0, int arg1) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
 	public boolean touchUp(int arg0, int arg1, int arg2, int arg3) {
 		// TODO Auto-generated method stub
 		return false;
@@ -280,5 +275,11 @@ public class MyGame implements Screen, InputProcessor {
 				}
 			}
 		}
+	}
+
+	@Override
+	public boolean mouseMoved(int arg0, int arg1) {
+		// TODO Auto-generated method stub
+		return false;
 	}
 }

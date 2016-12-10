@@ -14,7 +14,7 @@ public class LibgdxActivity extends  AndroidApplication {
         progress=new Progress(this);
         mg=new MyGame(this);
         ag=new ApplicationGame(mg);
-        initialize(ag, true); 
+        initialize(ag); 
     }
 	@Override
 	public void onBackPressed() {
