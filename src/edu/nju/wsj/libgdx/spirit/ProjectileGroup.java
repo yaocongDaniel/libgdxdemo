@@ -14,6 +14,8 @@ import com.badlogic.gdx.scenes.scene2d.ui.Image;
 public class ProjectileGroup extends Group{
 	private static final String TAG = "ProjectileGroup";
 	
+	public static final String PROJECTILEGROUPNAME = "projectiles";
+	
 	private int mMaxProjectile = 2;
 	private AtlasRegion mRegion;
 	private int mWidth;
@@ -31,6 +33,7 @@ public class ProjectileGroup extends Group{
 		mLeft = left;
 		mRight = right;
 		mTop = top - mHeight;
+		setName(PROJECTILEGROUPNAME);
 	}
 	
 	public void setStartPosition(int x, int y){
@@ -49,7 +52,7 @@ public class ProjectileGroup extends Group{
 		image.setPosition(mStart_X, mStart_Y);
 		image.setOrigin(image.getWidth() /2, image.getHeight() /2);
 		float time = x / (mRight * 1.0f);		
-		AddMove(image, time, x, y);//怪兽移动效果
+		AddMove(image, time, (int)(x - image.getWidth() / 2), (int)(y - image.getHeight() / 2));//怪兽移动效果
 		addActor(image);
 	}
 
@@ -78,7 +81,7 @@ public class ProjectileGroup extends Group{
 		}
 	}
 
-	public Boolean attackAlive(Actor target, Actor projectile) {
+	public static Boolean attackAlive(Actor target, Actor projectile) {
 		Rectangle rectangle = new Rectangle(target.getX(), target.getY(),
 				target.getWidth(), target.getHeight());// 创建一个矩形
 		return rectangle.contains(

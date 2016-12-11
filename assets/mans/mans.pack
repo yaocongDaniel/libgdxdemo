@@ -3,23 +3,30 @@ mans.png
 format: RGBA8888
 filter: Nearest,Nearest
 repeat: none
+ryuk
+  rotate: false
+  xy: 1, 130
+  size: 192, 256
+  orig: 192, 256
+  offset: 0, 0
+  index: -1
 gameball
   rotate: false
-  xy: 1, 13
+  xy: 1, 48
   size: 80, 80
   orig: 80, 80
   offset: 0, 0
   index: -1
 man0
   rotate: false
-  xy: 83, 48
+  xy: 195, 341
   size: 25, 45
   orig: 25, 45
   offset: 0, 0
   index: -1
 man1
   rotate: false
-  xy: 83, 1
+  xy: 1, 1
   size: 25, 45
   orig: 25, 45
   offset: 0, 0

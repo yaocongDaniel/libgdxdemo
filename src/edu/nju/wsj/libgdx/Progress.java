@@ -14,6 +14,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas.AtlasRegion;
 import com.badlogic.gdx.input.GestureDetector;
 import com.badlogic.gdx.input.GestureDetector.GestureListener;
 import com.badlogic.gdx.math.Rectangle;
@@ -88,22 +89,23 @@ public class Progress implements Screen, InputProcessor, GestureListener {
 			}
 			if(initgame){
 				// 开始处理飞镖
-				Actor[] projectile = mProjectileGroup.getChildren().begin();
-				Actor[] targets = mTargetGroup.getChildren().begin();
-				for (int i = 0; i < mProjectileGroup.getChildren().size; i++) {
-					Actor actor = projectile[i];
-					for (int j = 0; j < mTargetGroup.getChildren().size; j++) {
-						Actor target = targets[j];
-						if (mProjectileGroup.attackAlive(target, actor)) {
-							mTargetGroup.removeActor(target);
-							mProjectileGroup.removeActor(actor);
-							target.clear();
-							actor.clear();
-							mTargetGroup.addMan();
-							break;
-						}
-					}
-				}
+				mTargetGroup.update(stage);
+//				Actor[] projectile = mProjectileGroup.getChildren().begin();
+//				Actor[] targets = mTargetGroup.getChildren().begin();
+//				for (int i = 0; i < mProjectileGroup.getChildren().size; i++) {
+//					Actor actor = projectile[i];
+//					for (int j = 0; j < mTargetGroup.getChildren().size; j++) {
+//						Actor target = targets[j];
+//						if (mProjectileGroup.attackAlive(target, actor)) {
+//							mTargetGroup.removeActor(target);
+//							mProjectileGroup.removeActor(actor);
+//							target.clear();
+//							actor.clear();
+//							mTargetGroup.addMan();
+//							break;
+//						}
+//					}
+//				}
 			}
 		}
 	}
@@ -150,7 +152,10 @@ public class Progress implements Screen, InputProcessor, GestureListener {
 			stage.addActor(fpslabel);//将标签添加到舞台
 			
 			mAtlas =new TextureAtlas("mans/mans.pack");
-			mTargetGroup = new TargetGroup(mAtlas.findRegion("man0"), Gdx.graphics.getHeight() / 7, Gdx.graphics.getHeight() / 7, 
+//			AtlasRegion atlasregion = mAtlas.findRegion("man0");
+			AtlasRegion atlasregion = mAtlas.findRegion("ryuk");
+			mTargetGroup = new TargetGroup(atlasregion, true,
+					Gdx.graphics.getHeight() / 7, Gdx.graphics.getHeight() / 7, 
 					Gdx.graphics.getWidth() * 2 / 7, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 			
 			mProjectileGroup = new ProjectileGroup(mAtlas.findRegion("gameball"), Gdx.graphics.getHeight() / 7, Gdx.graphics.getHeight() / 7, 

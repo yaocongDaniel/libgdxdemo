@@ -1,24 +1,34 @@
 package edu.nju.wsj.libgdx.spirit;
 
+import android.util.Log;
+
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas.AtlasRegion;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Group;
+import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 
-public class TargetGroup extends Group{
+public class TargetGroup extends TargetController{
+	private final static String TAG = "TargetGroup";
 	
 	private AtlasRegion mRegion;
+	private boolean mAnimation;
 	private int mWidth;
 	private int mHeight;
 	private int mLeft;
 	private int mRight;
 	private int mTop;
-	public TargetGroup(AtlasRegion region, int w, int h, int left, int right, int top){
+	
+	private float mMinSpeed = 8;
+	private float mMaxSpeed = 12;
+	
+	public TargetGroup(AtlasRegion region, boolean animation, int w, int h, int left, int right, int top){
 		super();
 		mRegion = region;
+		mAnimation = animation;
 		mWidth = w;
 		mHeight = h;
 		mLeft = left;
@@ -28,12 +38,16 @@ public class TargetGroup extends Group{
 		addMan();
 		addMan();
 		addMan();
-		addMan();
 	}
 	
 	public void addMan() {
 		int tempY = 0;
-		Image image = new Image(mRegion);
+		Actor image = null;
+		if(mAnimation){
+			image = new Scythe(mRegion, mRegion.getRegionWidth() / 4, mRegion.getRegionHeight() / 4);
+		}else{
+			image = new Image(mRegion);
+		}
 		float tmp_value = image.getWidth() / image.getHeight();
 		image.setWidth(mHeight * tmp_value);
 		image.setHeight(mHeight);
@@ -64,15 +78,28 @@ public class TargetGroup extends Group{
 			}
 		} while (flag);
 		image.setY(tempY);
-		AddMove(image, MathUtils.random(3f,8f));//怪兽移动效果
+		float time = MathUtils.random(mMinSpeed, mMaxSpeed);
+		if(image instanceof Scythe){
+			((Scythe)image).setAnimationDuration(time);
+		}
+		AddMove(image, time);//怪兽移动效果
 		addActor(image);
+		Log.d(TAG, "      addMan()   mAnimation = " + mAnimation + "   " + mRegion.offsetX + "    " + mRegion.originalWidth + "   " + mRegion.packedWidth + "   " + mRegion.getRegionWidth());
 	}
 
 	private void AddMove(Actor actor, float time) {
 		actor.addAction(Actions.moveTo(0, actor.getY(), time));
-//		actor.setRotation(90);
 	}
 
+	@Override
+	public int update(Stage stage) {
+		int addnum = super.update(stage);
+		for(int i = 0; i < addnum; i ++){
+			addMan();
+		}
+		return addnum;
+	}
+	
 	@Override
 	public void draw(Batch batch, float parentAlpha) {
 		super.draw(batch, parentAlpha);
