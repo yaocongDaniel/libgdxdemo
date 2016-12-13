@@ -1,27 +1,37 @@
 package edu.nju.wsj.libgdx.spirit;
 
+import android.util.Log;
+
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 
 public class TargetController extends IController{
+	private final static String TAG = "TargetController";
 
 	@Override
 	public int update(Stage stage) {
 		int removetargetnum = 0;
-		Group projectiles = (Group) stage.getRoot().findActor(ProjectileGroup.PROJECTILEGROUPNAME);// 获取飞镖所在Group
-		Actor[] projectile = projectiles.getChildren().begin();
+//		Group projectiles = (Group) stage.getRoot().findActor(ProjectileGroup.PROJECTILEGROUPNAME);// 获取飞镖所在Group
+		Group dartsgroup = (Group) stage.getRoot().findActor(DartsController.DARTSCONTROLLERNAME);// 获取飞镖所在Group
+		Actor[] darts = dartsgroup.getChildren().begin();
 		Actor[] targets = this.getChildren().begin();
-		for (int i = 0; i < projectiles.getChildren().size; i++) {
-			Actor actor = projectile[i];
+		for (int i = 0; i < dartsgroup.getChildren().size; i++) {
+			Actor dart = darts[i];
 			for (int j = 0; j < this.getChildren().size; j++) {
 				Actor target = targets[j];
-				if (ProjectileGroup.attackAlive(target, actor)) {
+				int power = 1;
+				if(dart instanceof Dart){
+					power = ((Dart)dart).getPower();
+				}
+				if (DartsController.attackAlive(target, dart)) {
+					Log.d(TAG, "     update()    attackAlive~~~     power" + power);
 					if(target instanceof Scythe){
 						Scythe scythe = (Scythe) target;
-						scythe.beAttacked(1);
-						projectiles.removeActor(actor);
-						projectiles.clear();
+						scythe.beAttacked(power);
+						dartsgroup.removeActor(dart);
+						dart.clear();
+						Log.d(TAG, "     update()    power = " + power);
 						if (!scythe.isAlive()) {
 							this.removeActor(target);
 							target.clear();

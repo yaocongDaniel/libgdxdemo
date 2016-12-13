@@ -26,7 +26,9 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle;
 
 import edu.nju.wsj.libgdx.spirit.AnimalActor;
-import edu.nju.wsj.libgdx.spirit.ProjectileGroup;
+import edu.nju.wsj.libgdx.spirit.DartsController;
+import edu.nju.wsj.libgdx.spirit.DartsDetector;
+import edu.nju.wsj.libgdx.spirit.DartsListener;
 import edu.nju.wsj.libgdx.spirit.TargetGroup;
 
 public class Progress implements Screen, InputProcessor, GestureListener {
@@ -44,7 +46,7 @@ public class Progress implements Screen, InputProcessor, GestureListener {
 	boolean initgame = false;
 	
 	TargetGroup mTargetGroup = null;
-	ProjectileGroup mProjectileGroup = null;
+	DartsController mDartsController = null;
 	
 	TextureAtlas mAtlas = null;
 	@Override
@@ -84,28 +86,13 @@ public class Progress implements Screen, InputProcessor, GestureListener {
 					stage.addActor(animal);
 				}
 				stage.addActor(mTargetGroup);
-				stage.addActor(mProjectileGroup);
+				stage.addActor(mDartsController);
 				initgame = true;
 			}
 			if(initgame){
 				// 开始处理飞镖
 				mTargetGroup.update(stage);
-//				Actor[] projectile = mProjectileGroup.getChildren().begin();
-//				Actor[] targets = mTargetGroup.getChildren().begin();
-//				for (int i = 0; i < mProjectileGroup.getChildren().size; i++) {
-//					Actor actor = projectile[i];
-//					for (int j = 0; j < mTargetGroup.getChildren().size; j++) {
-//						Actor target = targets[j];
-//						if (mProjectileGroup.attackAlive(target, actor)) {
-//							mTargetGroup.removeActor(target);
-//							mProjectileGroup.removeActor(actor);
-//							target.clear();
-//							actor.clear();
-//							mTargetGroup.addMan();
-//							break;
-//						}
-//					}
-//				}
+				mDartsController.update(stage);
 			}
 		}
 	}
@@ -145,6 +132,7 @@ public class Progress implements Screen, InputProcessor, GestureListener {
 			animal.setHeight(animal.getWidth());
 			animal.setX(0);
 			animal.setY(Gdx.graphics.getHeight() / 2 - animal.getHeight() / 2);
+			animal.setName("player");
 			LabelStyle labelStyle =new LabelStyle(new BitmapFont(), Color.BLACK);//创建一个Label样式，使用默认黑色字体
 			fpslabel =new Label("FPS:", labelStyle);//创建标签，显示的文字是FPS：
 			fpslabel.setY(0);			
@@ -158,24 +146,25 @@ public class Progress implements Screen, InputProcessor, GestureListener {
 					Gdx.graphics.getHeight() / 7, Gdx.graphics.getHeight() / 7, 
 					Gdx.graphics.getWidth() * 2 / 7, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 			
-			mProjectileGroup = new ProjectileGroup(mAtlas.findRegion("gameball"), Gdx.graphics.getHeight() / 7, Gdx.graphics.getHeight() / 7, 
+//			mProjectileGroup = new ProjectileGroup(mAtlas.findRegion("gameball"), Gdx.graphics.getHeight() / 7, Gdx.graphics.getHeight() / 7, 
+//					Gdx.graphics.getWidth() / 7, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+//			mProjectileGroup.setStartPosition((int)(animal.getX() + animal.getWidth()), (int)(animal.getY() + animal.getHeight()/2));
+			
+			mDartsController = new DartsController(mAtlas.findRegion("gameball"), Gdx.graphics.getHeight() / 7, Gdx.graphics.getHeight() / 7, 
 					Gdx.graphics.getWidth() / 7, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-			mProjectileGroup.setStartPosition((int)(animal.getX() + animal.getWidth()), (int)(animal.getY() + animal.getHeight()/2));
 			
 			hasini = true;
 		}
 		InputMultiplexer multiplexer = new InputMultiplexer();
 		multiplexer.addProcessor(this);
 		multiplexer.addProcessor(stage);
-		multiplexer.addProcessor(new GestureDetector(this));
+		multiplexer.addProcessor(new DartsDetector(stage, this));// 添加手势识别
+		
 		Gdx.input.setInputProcessor(multiplexer);
 	}
 
 	@Override
 	public boolean touchDown(int screenX, int screenY, int arg2, int arg3) {
-		Vector3 vector3 = new Vector3(screenX, screenY, 0);
-		stage.getCamera().unproject(vector3);// 坐标转化
-		mProjectileGroup.addProjectile((int)vector3.x, (int)vector3.y);
 		return false;
 	}
 	@Override
