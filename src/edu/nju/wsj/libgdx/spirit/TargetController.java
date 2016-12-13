@@ -2,12 +2,21 @@ package edu.nju.wsj.libgdx.spirit;
 
 import android.util.Log;
 
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 
 public class TargetController extends IController{
 	private final static String TAG = "TargetController";
+	private Sound great = null;
+
+	public Sound getGreat() {
+		return great;
+	}
+	public void setGreat(Sound great) {
+		this.great = great;
+	}
 
 	@Override
 	public int update(Stage stage) {
@@ -31,6 +40,9 @@ public class TargetController extends IController{
 						scythe.beAttacked(power);
 						dartsgroup.removeActor(dart);
 						dart.clear();
+						if(great != null){
+							great.play();
+						}
 						Log.d(TAG, "     update()    power = " + power);
 						if (!scythe.isAlive()) {
 							this.removeActor(target);
@@ -44,4 +56,5 @@ public class TargetController extends IController{
 		}
 		return removetargetnum;
 	}
+	
 }

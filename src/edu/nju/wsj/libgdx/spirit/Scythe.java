@@ -25,15 +25,21 @@ public class Scythe extends Actor{
 	private int pixHeight =10;// 血条高度
 	private int maxHp = 3;// 总血量
 	private int currentHp = maxHp;// 当前血量
-
-	public Scythe(AtlasRegion atlasRegion, int titleWidth, int titleHeight){
+	
+	public Scythe(AtlasRegion atlasRegion, int titleWidth, int titleHeight, int type){
 		super();
 		this.setWidth(titleWidth);//设置高度
 		this.setHeight(titleHeight);//设置宽度
-		TextureRegion[][] temp = atlasRegion.split((int)titleWidth, (int)titleHeight);//分割图块
 		walkFrames = new TextureRegion[4];//获取第二行的4帧
-		for (int i = 0; i < 4; i++) {
-			walkFrames[i] = temp[1][i];
+		if(TextureManager.getInstance().getTexture(type + "_0") == null){
+			TextureRegion[][] temp = atlasRegion.split((int)titleWidth, (int)titleHeight);//分割图块
+			for (int i = 0; i < 4; i++) {
+				walkFrames[i] = temp[1][i];
+				TextureManager.getInstance().addTexture(type + "_" + i, walkFrames[i]);
+			}
+		}else{for (int i = 0; i < 4; i++) {
+			walkFrames[i] = TextureManager.getInstance().getTexture(type + "_" + i);
+		}
 		}
 		animation = new Animation(0.1f, walkFrames);//创建动画，帧间隔0.1
 	}
@@ -55,7 +61,7 @@ public class Scythe extends Actor{
 			mPixmap.setColor(Color.BLACK);// 设置颜色为黑色
 			mPixmap.drawRectangle(0, 0, (int) getWidth(), pixHeight);// 绘制边框
 			Texture pixmaptex = new Texture(mPixmap);// 生成图片
-			mTextureRegion = new TextureRegion(pixmaptex, (int) getWidth(), pixHeight);// 切割图片			
+			mTextureRegion = new TextureRegion(pixmaptex, (int) getWidth(), pixHeight);// 切割图片	
 
 			mPixmapRed = new Pixmap((int)getWidth(), 8, Format.RGBA8888);// 生成一张64*8的图片
 			mPixmapRed.setColor(Color.RED);// 设置颜色为红色

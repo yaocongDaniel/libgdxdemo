@@ -10,6 +10,8 @@ import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.gdx.audio.Music;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
@@ -48,6 +50,8 @@ public class Progress implements Screen, InputProcessor, GestureListener {
 	TargetGroup mTargetGroup = null;
 	DartsController mDartsController = null;
 	
+	Music backgroundMusic;
+	
 	TextureAtlas mAtlas = null;
 	@Override
 	public void hide() {
@@ -85,8 +89,21 @@ public class Progress implements Screen, InputProcessor, GestureListener {
 					animal.iniResource();
 					stage.addActor(animal);
 				}
+				backgroundMusic = manager.get("audio/background.ogg", Music.class);
+				backgroundMusic.setLooping(true);//循环播放
+				backgroundMusic.setVolume(0.4f);//设置音量
+				backgroundMusic.play();//播放
+				
+				mAtlas = manager.get("mans/mans.pack", TextureAtlas.class);
+				AtlasRegion atlasregion = mAtlas.findRegion("ryuk");
+				mTargetGroup = new TargetGroup(atlasregion, manager, true,
+						Gdx.graphics.getHeight() / 7, Gdx.graphics.getHeight() / 7, 
+						Gdx.graphics.getWidth() * 2 / 7, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+				mDartsController = new DartsController(mAtlas.findRegion("gameball"), manager, Gdx.graphics.getHeight() / 8, Gdx.graphics.getHeight() / 8, 
+						Gdx.graphics.getWidth() / 7, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 				stage.addActor(mTargetGroup);
 				stage.addActor(mDartsController);
+				
 				initgame = true;
 			}
 			if(initgame){
@@ -128,6 +145,11 @@ public class Progress implements Screen, InputProcessor, GestureListener {
 			for (int i = 1; i < 30; i++) {
 				manager.load("animal/" + i + ".png", Texture.class);
 			}
+			manager.load("audio/background.ogg", Music.class);
+			manager.load("audio/bing.ogg", Sound.class);
+			manager.load("audio/great.ogg", Sound.class);
+			manager.load("mans/mans.pack", TextureAtlas.class);
+			
 			animal.setWidth(Gdx.graphics.getHeight() / 3);
 			animal.setHeight(animal.getWidth());
 			animal.setX(0);
@@ -138,20 +160,6 @@ public class Progress implements Screen, InputProcessor, GestureListener {
 			fpslabel.setY(0);			
 			fpslabel.setX(Gdx.graphics.getWidth() - fpslabel.getPrefWidth());//设置X值，显示为最后一个字紧靠屏幕最右侧
 			stage.addActor(fpslabel);//将标签添加到舞台
-			
-			mAtlas =new TextureAtlas("mans/mans.pack");
-//			AtlasRegion atlasregion = mAtlas.findRegion("man0");
-			AtlasRegion atlasregion = mAtlas.findRegion("ryuk");
-			mTargetGroup = new TargetGroup(atlasregion, true,
-					Gdx.graphics.getHeight() / 7, Gdx.graphics.getHeight() / 7, 
-					Gdx.graphics.getWidth() * 2 / 7, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-			
-//			mProjectileGroup = new ProjectileGroup(mAtlas.findRegion("gameball"), Gdx.graphics.getHeight() / 7, Gdx.graphics.getHeight() / 7, 
-//					Gdx.graphics.getWidth() / 7, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-//			mProjectileGroup.setStartPosition((int)(animal.getX() + animal.getWidth()), (int)(animal.getY() + animal.getHeight()/2));
-			
-			mDartsController = new DartsController(mAtlas.findRegion("gameball"), Gdx.graphics.getHeight() / 7, Gdx.graphics.getHeight() / 7, 
-					Gdx.graphics.getWidth() / 7, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 			
 			hasini = true;
 		}

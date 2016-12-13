@@ -2,6 +2,8 @@ package edu.nju.wsj.libgdx.spirit;
 
 import android.util.Log;
 
+import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas.AtlasRegion;
 import com.badlogic.gdx.math.MathUtils;
@@ -25,7 +27,7 @@ public class TargetGroup extends TargetController{
 	private float mMinSpeed = 8;
 	private float mMaxSpeed = 12;
 	
-	public TargetGroup(AtlasRegion region, boolean animation, int w, int h, int left, int right, int top){
+	public TargetGroup(AtlasRegion region, AssetManager manager, boolean animation, int w, int h, int left, int right, int top){
 		super();
 		mRegion = region;
 		mAnimation = animation;
@@ -34,6 +36,9 @@ public class TargetGroup extends TargetController{
 		mLeft = left;
 		mRight = right;
 		mTop = top - mHeight;
+		setGreat(manager.get("audio/great.ogg", Sound.class));
+		addMan();
+		addMan();
 		addMan();
 		addMan();
 		addMan();
@@ -43,8 +48,10 @@ public class TargetGroup extends TargetController{
 	public void addMan() {
 		int tempY = 0;
 		Actor image = null;
+		int man_h = mRegion.getRegionHeight();
 		if(mAnimation){
-			image = new Scythe(mRegion, mRegion.getRegionWidth() / 4, mRegion.getRegionHeight() / 4);
+			image = new Scythe(mRegion, mRegion.getRegionWidth() / 4, mRegion.getRegionHeight() / 4, 0);
+			man_h = mRegion.getRegionHeight() / 4;
 		}else{
 			image = new Image(mRegion);
 		}
@@ -65,12 +72,12 @@ public class TargetGroup extends TargetController{
 					flag = true;
 					break;
 				} else if (tempY < tempActor.getY()) {// 如果生成的Y值小于当前怪兽的Y值，则判断生成的Y值加上高度后是否合适
-					if ((tempY + mRegion.getRegionHeight()) >= tempActor.getY()) {
+					if ((tempY + man_h) >= tempActor.getY()) {
 						flag = true;
 						break;
 					}
 				} else {// 如果生成的Y值大于当前怪兽的Y值，则判断当前怪兽的Y值加上高度后是否合适
-					if ((tempY - mRegion.getRegionHeight()) < tempActor.getY()) {
+					if ((tempY - man_h) < tempActor.getY()) {
 						flag = true;
 						break;
 					}
