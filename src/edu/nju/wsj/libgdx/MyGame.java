@@ -198,11 +198,13 @@ public class MyGame implements Screen, InputProcessor {
 	private Handler mShowParticleHandler = new Handler(){
 		public void dispatchMessage(android.os.Message msg) {
 			synchronized (mShowParticleHandler) {
-				tem = particlepool.obtain();
-				float x = MathUtils.random(Gdx.graphics.getWidth() / 3, Gdx.graphics.getWidth() * 2 / 3);
-				float y = MathUtils.random(0, Gdx.graphics.getHeight());
-				tem.setPosition(x, y);
-				particlelist.add(tem);
+				for(int i = 0; i < MathUtils.random(1, 5); i++){
+					tem = particlepool.obtain();
+					float x = MathUtils.random(Gdx.graphics.getWidth() / 4, Gdx.graphics.getWidth() * 3 / 4);
+					float y = MathUtils.random(0, Gdx.graphics.getHeight());
+					tem.setPosition(x, y);
+					particlelist.add(tem);
+				}
 			}
 			mShowParticleHandler.sendEmptyMessageDelayed(0, MathUtils.random(10, 500));
 		};
