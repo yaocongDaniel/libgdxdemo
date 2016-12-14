@@ -38,6 +38,10 @@ public class DartsDetector extends GestureDetector {
 			dart.setPower(1);
 		}
 		dartsController.AddDarts(dart);
+		if(man instanceof AnimalActor){
+			((AnimalActor)man).play();
+		}
+		
 		return super.touchUp(x, y, pointer, button);
 	}
 }
