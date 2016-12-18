@@ -23,9 +23,12 @@ public class Scythe extends Actor{
 	
 	private int margin =2;// 血条和人物之间的间隔
 	private int pixHeight =10;// 血条高度
-	private int maxHp = 3;// 总血量
+	private int maxHp = 2;// 总血量
 	private int currentHp = maxHp;// 当前血量
 	
+	private int curCount = maxHp;
+	private int curHitPower = maxHp / 2;
+
 	public Scythe(AtlasRegion atlasRegion, int titleWidth, int titleHeight, int type){
 		super();
 		this.setWidth(titleWidth);//设置高度
@@ -66,7 +69,6 @@ public class Scythe extends Actor{
 			mPixmapRed = new Pixmap((int)getWidth(), 8, Format.RGBA8888);// 生成一张64*8的图片
 			mPixmapRed.setColor(Color.RED);// 设置颜色为红色
 			int curwidth = (int) (getWidth() * currentHp / maxHp * 1.0f);
-//			curwidth = 102;
 			mPixmapRed.fillRectangle(0, 1, curwidth, pixHeight -2);// 绘制血条
 			Texture pixmaptexred = new Texture(mPixmapRed);// 生成图片
 			mTextureRegionRed = new TextureRegion(pixmaptexred, (int) getWidth(), pixHeight);// 切割图片
@@ -116,5 +118,32 @@ public class Scythe extends Actor{
 			mPixmapRed.dispose();
 			mPixmapRed = null;
 		}
+	}
+	
+
+	/**
+	 * 获取被消灭时可获得的分数
+	 * */
+	public int getCurCount() {
+		return curCount;
+	}
+	/**
+	 * 设置被消灭时可获得的分数
+	 * */
+	public void setCurCount(int curCount) {
+		this.curCount = curCount;
+	}
+
+	/**
+	 * 获取可对玩家造成的伤害
+	 * */
+	public int getCurHitPower() {
+		return curHitPower;
+	}
+	/**
+	 * 设置可对玩家造成的伤害
+	 * */
+	public void setCurHitPower(int curHitPower) {
+		this.curHitPower = curHitPower;
 	}
 }

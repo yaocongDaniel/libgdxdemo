@@ -36,6 +36,7 @@ public class DartsDetector extends GestureDetector {
 			dart.setColor(Color.RED);// …Ë÷√≥…∫Ï…´
 		}else{
 			dart.setPower(1);
+//			dart.setColor(new Color(0x00000000));
 		}
 		dartsController.AddDarts(dart);
 		if(man instanceof AnimalActor){

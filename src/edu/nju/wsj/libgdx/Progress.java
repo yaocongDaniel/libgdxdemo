@@ -30,29 +30,28 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle;
 import edu.nju.wsj.libgdx.spirit.AnimalActor;
 import edu.nju.wsj.libgdx.spirit.DartsController;
 import edu.nju.wsj.libgdx.spirit.DartsDetector;
-import edu.nju.wsj.libgdx.spirit.DartsListener;
 import edu.nju.wsj.libgdx.spirit.TargetGroup;
 
 public class Progress implements Screen, InputProcessor, GestureListener {
-	ProgressBar bar;
-	AnimalActor animal;
-	Stage stage;
-	AssetManager manager;
-	boolean hasini;
-	boolean BackHasTouched;
-	LibgdxActivity activity;
+	private ProgressBar bar;
+	private AnimalActor animal;
+	private Stage mStage;
+	private AssetManager manager;
+	private boolean hasini;
+	private boolean BackHasTouched;
+	private LibgdxActivity activity;
 	// 标记AnimalActor的缩放倍数
-	Label fpslabel;
 
-	boolean playing = false;
-	boolean initgame = false;
+	private Music backgroundMusic;	
+	private TextureAtlas mAtlas = null;
+	private boolean playing = false;
+	private boolean initgame = false;
 	
-	TargetGroup mTargetGroup = null;
-	DartsController mDartsController = null;
+	private TargetGroup mTargetGroup = null;
+	private DartsController mDartsController = null;
+	private Label fpslabel;
+	private Label mTitleLabel;
 	
-	Music backgroundMusic;
-	
-	TextureAtlas mAtlas = null;
 	@Override
 	public void hide() {
 	}
@@ -63,8 +62,8 @@ public class Progress implements Screen, InputProcessor, GestureListener {
 		if (!BackHasTouched) {
 			Gdx.gl.glClear(GL10.GL_COLOR_BUFFER_BIT);
 			Gdx.gl.glClearColor(1f, 1f, 1f, 0f);
-			stage.act(Gdx.graphics.getDeltaTime());
-			stage.draw();
+			mStage.act(Gdx.graphics.getDeltaTime());
+			mStage.draw();
 
 			if (hasini) {
 				if(manager.update()){
@@ -87,7 +86,7 @@ public class Progress implements Screen, InputProcessor, GestureListener {
 			if(playing && !initgame){
 				if(!animal.hasInit()){
 					animal.iniResource();
-					stage.addActor(animal);
+					mStage.addActor(animal);
 				}
 				backgroundMusic = manager.get("audio/background.ogg", Music.class);
 				backgroundMusic.setLooping(true);//循环播放
@@ -101,15 +100,15 @@ public class Progress implements Screen, InputProcessor, GestureListener {
 						Gdx.graphics.getWidth() * 2 / 7, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 				mDartsController = new DartsController(mAtlas.findRegion("gameball"), manager, Gdx.graphics.getHeight() / 8, Gdx.graphics.getHeight() / 8, 
 						Gdx.graphics.getWidth() / 7, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-				stage.addActor(mTargetGroup);
-				stage.addActor(mDartsController);
+				mStage.addActor(mTargetGroup);
+				mStage.addActor(mDartsController);
 				
 				initgame = true;
 			}
 			if(initgame){
 				// 开始处理飞镖
-				mTargetGroup.update(stage);
-				mDartsController.update(stage);
+				mTargetGroup.update(mStage);
+				mDartsController.update(mStage);
 			}
 		}
 	}
@@ -135,8 +134,8 @@ public class Progress implements Screen, InputProcessor, GestureListener {
 			int y = (Gdx.graphics.getHeight() - h) / 2;
 			bar = new ProgressBar(x, y, w, h);
 			// 新建一个舞台
-			stage = new Stage();
-			stage.addActor(bar);
+			mStage = new Stage();
+			mStage.addActor(bar);
 			// 记得初始化一下AssetManager实例
 			manager = new AssetManager();
 			// 传入AssetManger的引用，便于animal的资源初始化，但是注意了，只有在调用iniResourse()后资源才被初始化
@@ -155,22 +154,36 @@ public class Progress implements Screen, InputProcessor, GestureListener {
 			animal.setX(0);
 			animal.setY(Gdx.graphics.getHeight() / 2 - animal.getHeight() / 2);
 			animal.setName("player");
+			
 			LabelStyle labelStyle =new LabelStyle(new BitmapFont(), Color.BLACK);//创建一个Label样式，使用默认黑色字体
 			fpslabel =new Label("FPS:", labelStyle);//创建标签，显示的文字是FPS：
 			fpslabel.setY(0);			
 			fpslabel.setX(Gdx.graphics.getWidth() - fpslabel.getPrefWidth());//设置X值，显示为最后一个字紧靠屏幕最右侧
-			stage.addActor(fpslabel);//将标签添加到舞台
+			mStage.addActor(fpslabel);//将标签添加到舞台
 			
 			hasini = true;
 		}
 		InputMultiplexer multiplexer = new InputMultiplexer();
 		multiplexer.addProcessor(this);
-		multiplexer.addProcessor(stage);
-		multiplexer.addProcessor(new DartsDetector(stage, this));// 添加手势识别
+		multiplexer.addProcessor(mStage);
+		multiplexer.addProcessor(new DartsDetector(mStage, this));// 添加手势识别
 		
 		Gdx.input.setInputProcessor(multiplexer);
 	}
 
+	private void initTitle(Stage stage){
+		LabelStyle labelStyle =new LabelStyle(new BitmapFont(), Color.BLACK);//创建一个Label样式，使用默认黑色字体
+		mTitleLabel =new Label("FPS:", labelStyle);//创建标签，显示的文字是FPS：
+		mTitleLabel.setY(Gdx.graphics.getHeight() - fpslabel.getPrefHeight() * 2);			
+		mTitleLabel.setX(10);//设置X值，显示为最后一个字紧靠屏幕最右侧
+		stage.addActor(mTitleLabel);//将标签添加到舞台
+	}
+	private void updateTitle(){
+		if(mTitleLabel != null){
+			mTitleLabel.setText("");
+		}
+	}
+	
 	@Override
 	public boolean touchDown(int screenX, int screenY, int arg2, int arg3) {
 		return false;

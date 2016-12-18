@@ -45,6 +45,7 @@ public class TargetController extends IController{
 						}
 						Log.d(TAG, "     update()    power = " + power);
 						if (!scythe.isAlive()) {
+							GameControl.getInstance().setTotalCountPerHit(scythe.getCurCount());
 							this.removeActor(target);
 							target.clear();
 							removetargetnum ++;

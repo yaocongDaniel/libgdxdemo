@@ -24,9 +24,6 @@ public class TargetGroup extends TargetController{
 	private int mRight;
 	private int mTop;
 	
-	private float mMinSpeed = 8;
-	private float mMaxSpeed = 12;
-	
 	public TargetGroup(AtlasRegion region, AssetManager manager, boolean animation, int w, int h, int left, int right, int top){
 		super();
 		mRegion = region;
@@ -85,7 +82,8 @@ public class TargetGroup extends TargetController{
 			}
 		} while (flag);
 		image.setY(tempY);
-		float time = MathUtils.random(mMinSpeed, mMaxSpeed);
+		float time = MathUtils.random(GameControl.getInstance().getMinScytheSpeed(), 
+										GameControl.getInstance().getMaxScytheSpeed());
 		if(image instanceof Scythe){
 			((Scythe)image).setAnimationDuration(time);
 		}
@@ -114,6 +112,11 @@ public class TargetGroup extends TargetController{
 		for (int j = 0; j < this.getChildren().size; j++) {
 			Actor tempActor = actors[j];
 			if(tempActor.getX() < mLeft){
+				int hithp = 1;
+				if(tempActor instanceof Scythe){
+					hithp = ((Scythe)tempActor).getCurHitPower();
+				}
+				GameControl.getInstance().setTotalCountPerHit(hithp);
 				tempActor.remove();
 				tempActor.clear();
 				addMan();
