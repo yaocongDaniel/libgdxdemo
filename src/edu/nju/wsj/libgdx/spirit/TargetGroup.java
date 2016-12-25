@@ -116,7 +116,7 @@ public class TargetGroup extends TargetController{
 				if(tempActor instanceof Scythe){
 					hithp = ((Scythe)tempActor).getCurHitPower();
 				}
-				GameControl.getInstance().setTotalCountPerHit(hithp);
+				GameControl.getInstance().setPlayHpPerHit(hithp);
 				tempActor.remove();
 				tempActor.clear();
 				addMan();

@@ -116,4 +116,10 @@ public class GameControl {
 			this.mPlayHp -= perhithp;
 		}
 	}
+	
+	public void Update(){
+		if(mPlayHp <= 0){
+			//GameOver
+		}
+	}
 }

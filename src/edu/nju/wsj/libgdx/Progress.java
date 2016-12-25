@@ -30,7 +30,9 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle;
 import edu.nju.wsj.libgdx.spirit.AnimalActor;
 import edu.nju.wsj.libgdx.spirit.DartsController;
 import edu.nju.wsj.libgdx.spirit.DartsDetector;
+import edu.nju.wsj.libgdx.spirit.GameControl;
 import edu.nju.wsj.libgdx.spirit.TargetGroup;
+import edu.nju.wsj.libgdx.utils.FontFactory;
 
 public class Progress implements Screen, InputProcessor, GestureListener {
 	private ProgressBar bar;
@@ -76,6 +78,8 @@ public class Progress implements Screen, InputProcessor, GestureListener {
 				}
 				fpslabel.setText("FPS:" + Gdx.graphics.getFramesPerSecond());
 				fpslabel.setX(Gdx.graphics.getWidth() - fpslabel.getPrefWidth());//设置X值，显示为最后一个字紧靠屏幕最右侧
+				
+				updateTitle();
 			}
 			// 我们做一个标记，看看未加载（Queued）完成的资源和已加载完成的资源的数量（Loaded）
 			if (!manager.update()) {
@@ -101,8 +105,7 @@ public class Progress implements Screen, InputProcessor, GestureListener {
 				mDartsController = new DartsController(mAtlas.findRegion("gameball"), manager, Gdx.graphics.getHeight() / 8, Gdx.graphics.getHeight() / 8, 
 						Gdx.graphics.getWidth() / 7, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 				mStage.addActor(mTargetGroup);
-				mStage.addActor(mDartsController);
-				
+				mStage.addActor(mDartsController);				
 				initgame = true;
 			}
 			if(initgame){
@@ -160,7 +163,8 @@ public class Progress implements Screen, InputProcessor, GestureListener {
 			fpslabel.setY(0);			
 			fpslabel.setX(Gdx.graphics.getWidth() - fpslabel.getPrefWidth());//设置X值，显示为最后一个字紧靠屏幕最右侧
 			mStage.addActor(fpslabel);//将标签添加到舞台
-			
+
+			initTitle(mStage);
 			hasini = true;
 		}
 		InputMultiplexer multiplexer = new InputMultiplexer();
@@ -172,15 +176,17 @@ public class Progress implements Screen, InputProcessor, GestureListener {
 	}
 
 	private void initTitle(Stage stage){
-		LabelStyle labelStyle =new LabelStyle(new BitmapFont(), Color.BLACK);//创建一个Label样式，使用默认黑色字体
+		LabelStyle labelStyle =new LabelStyle(FontFactory.getInstance().createFreeTypeFont("defaultFont.ttc", 60), Color.RED);//创建一个Label样式，使用默认黑色字体
 		mTitleLabel =new Label("FPS:", labelStyle);//创建标签，显示的文字是FPS：
-		mTitleLabel.setY(Gdx.graphics.getHeight() - fpslabel.getPrefHeight() * 2);			
+		mTitleLabel.setY(Gdx.graphics.getHeight() - fpslabel.getPrefHeight() * 5);			
 		mTitleLabel.setX(10);//设置X值，显示为最后一个字紧靠屏幕最右侧
 		stage.addActor(mTitleLabel);//将标签添加到舞台
 	}
 	private void updateTitle(){
 		if(mTitleLabel != null){
-			mTitleLabel.setText("");
+			String text = "分数： " + GameControl.getInstance().getTotalCount();
+			text += ("\nHP：" + GameControl.getInstance().getPlayHp());
+			mTitleLabel.setText(text);
 		}
 	}
 	

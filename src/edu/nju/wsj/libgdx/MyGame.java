@@ -37,6 +37,8 @@ import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
+import edu.nju.wsj.libgdx.utils.FontFactory;
+
 public class MyGame implements Screen, InputProcessor {
 	private final static String TAG = "MyGame";
 	
@@ -132,9 +134,11 @@ public class MyGame implements Screen, InputProcessor {
 			backgroud.setHeight(height);
 			stage.addActor(backgroud);
 			
-//			tx2 = new Texture(Gdx.files.internal("button1_480.png"));
-//			tx1 = new Texture(Gdx.files.internal("button2_480.png"));
-//			tx3 = new Texture(Gdx.files.internal("button3_480.png"));
+			tx1 = new Texture(Gdx.files.internal("button1_480.png"));
+			tx2 = new Texture(Gdx.files.internal("button2_480.png"));
+			tx3 = new Texture(Gdx.files.internal("button3_480.png"));
+			TextureRegionDrawable tx1drawable = new TextureRegionDrawable(new TextureRegion(tx1,0, 0, tx1.getWidth(), tx1.getHeight()));
+			TextureRegionDrawable tx2drawable = new TextureRegionDrawable(new TextureRegion(tx2,0, 0, tx2.getWidth(), tx2.getHeight()));
 //			button_start = new Button(new ButtonStyle(new TextureRegionDrawable(new TextureRegion(tx1,0, 0, tx1.getWidth(), tx1.getHeight())), 
 //					new TextureRegionDrawable(new TextureRegion(tx2, 0, 0, tx2.getWidth(), tx2.getHeight())), 
 //					new TextureRegionDrawable(new TextureRegion(tx3, 0, 0, tx3.getWidth(), tx3.getHeight()))));
@@ -150,8 +154,17 @@ public class MyGame implements Screen, InputProcessor {
 //			button_start.setX(width / 5);
 //			button_start.setY(height / 5);
 //			stage.addActor(button_start);
+			
+
 			m_Skin = new Skin(Gdx.files.internal("data/uiskin.json"));
-			TextButton startBut = new TextButton("Start", m_Skin, "default");
+			
+			TextButton.TextButtonStyle textButtonStyle = new TextButton.TextButtonStyle();
+			textButtonStyle.up = tx1drawable;
+			textButtonStyle.down = tx2drawable;
+			textButtonStyle.fontColor = Color.WHITE;
+			textButtonStyle.font = FontFactory.getInstance().createFreeTypeFont("defaultFont.ttc", 60);
+
+			TextButton startBut = new TextButton("¿ªÊ¼", textButtonStyle);
 			startBut.setWidth(width / 8);
 			startBut.setHeight(height / 8);
 			startBut.setX(width / 2 - startBut.getWidth() / 2);
@@ -163,7 +176,7 @@ public class MyGame implements Screen, InputProcessor {
 				}
 			});
 			stage.addActor(startBut);
-			TextButton exitBut = new TextButton("Exit", m_Skin, "default");
+			TextButton exitBut = new TextButton("ÍË³ö", textButtonStyle);
 			exitBut.setWidth(width / 8);
 			exitBut.setHeight(height / 8);
 			exitBut.setX(width / 2 - startBut.getWidth() / 2);
